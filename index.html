@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Fuerza</title>
+    <script>
+        // Función para enviar datos a la API
+        function enviarDatos(fuerza) {
+            fetch('https://your-project-name.glitch.me/api/receiveData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fuerza: fuerza })
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Datos enviados:', data);
+                // Guardar la fuerza en IndexedDB
+                guardarEnIndexedDB(fuerza);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Función para guardar en IndexedDB
+        function guardarEnIndexedDB(fuerza) {
+            let db;
+            const request = indexedDB.open('FuerzaDB', 1);
+
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                const objectStore = db.createObjectStore('fuerza', { keyPath: 'id', autoIncrement: true });
+                objectStore.createIndex('fuerza', 'fuerza', { unique: false });
+            };
+
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                const transaction = db.transaction(['fuerza'], 'readwrite');
+                const objectStore = transaction.objectStore('fuerza');
+                objectStore.add({ fuerza: fuerza });
+                transaction.oncomplete = function() {
+                    console.log('Fuerza guardada en IndexedDB');
+                };
+            };
+
+            request.onerror = function(event) {
+                console.error('Error al abrir IndexedDB:', event.target.errorCode);
+            };
+        }
+
+        // Función para simular la obtención de la fuerza del jugador
+        function obtenerFuerzaJugador() {
+            // Simulación de obtener la fuerza del jugador
+            const fuerza = Math.floor(Math.random() * 10000); // Fuerza aleatoria entre 0 y 10000
+            enviarDatos(fuerza);
+        }
+    </script>
+</head>
+<body>
+    <h1>Enviar Fuerza del Jugador</h1>
+    <button onclick="obtenerFuerzaJugador()">Enviar Fuerza</button>
+</body>
+</html>
