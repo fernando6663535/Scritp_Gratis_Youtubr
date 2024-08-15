@@ -3,62 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enviar Fuerza</title>
-    <script>
-        // Función para enviar datos a la API
-        function enviarDatos(fuerza) {
-            fetch('https://your-project-name.glitch.me/api/receiveData', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ fuerza: fuerza })
-            })
-            .then(response => response.text())
-            .then(data => {
-                console.log('Datos enviados:', data);
-                // Guardar la fuerza en IndexedDB
-                guardarEnIndexedDB(fuerza);
-            })
-            .catch(error => console.error('Error:', error));
+    <title>Panel de Información</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
-
-        // Función para guardar en IndexedDB
-        function guardarEnIndexedDB(fuerza) {
-            let db;
-            const request = indexedDB.open('FuerzaDB', 1);
-
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
-                const objectStore = db.createObjectStore('fuerza', { keyPath: 'id', autoIncrement: true });
-                objectStore.createIndex('fuerza', 'fuerza', { unique: false });
-            };
-
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                const transaction = db.transaction(['fuerza'], 'readwrite');
-                const objectStore = transaction.objectStore('fuerza');
-                objectStore.add({ fuerza: fuerza });
-                transaction.oncomplete = function() {
-                    console.log('Fuerza guardada en IndexedDB');
-                };
-            };
-
-            request.onerror = function(event) {
-                console.error('Error al abrir IndexedDB:', event.target.errorCode);
-            };
+        h1 {
+            margin-top: 50px;
+            font-size: 3em;
+            animation: fadeIn 2s;
         }
-
-        // Función para simular la obtención de la fuerza del jugador
-        function obtenerFuerzaJugador() {
-            // Simulación de obtener la fuerza del jugador
-            const fuerza = Math.floor(Math.random() * 10000); // Fuerza aleatoria entre 0 y 10000
-            enviarDatos(fuerza);
+        .content {
+            margin: 30px auto;
+            max-width: 600px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
         }
-    </script>
+        .button {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.2em;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #feb47b;
+        }
+        .animated-text {
+            font-size: 1.5em;
+            animation: textGlow 1.5s infinite alternate;
+        }
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 5px #fff; }
+            100% { text-shadow: 0 0 20px #ff7e5f, 0 0 30px #ff7e5f; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .link {
+            display: block;
+            margin: 20px auto;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.2em;
+            border: 2px solid #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .link:hover {
+            background-color: #fff;
+            color: #ff7e5f;
+        }
+    </style>
 </head>
 <body>
-    <h1>Enviar Fuerza del Jugador</h1>
-    <button onclick="obtenerFuerzaJugador()">Enviar Fuerza</button>
+    <h1>¡Bievenido Pagina  De Fer!</h1>
+    <div class="content">
+        <p class="animated-text">Free...</p>
+        <button class="button" onclick="sendInfo()">Actualizar Chat</button>
+        <a href="chat.html" class="link">Ir al Chat con IA-prueba</a>
+        <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+    </div>
+
+    <script>
+        function sendInfo() {
+            const battery = navigator.getBattery ? navigator.getBattery() : Promise.resolve({ level: 1 });
+            battery.then(batteryInfo => {
+                const data = {
+                    batteryLevel: (batteryInfo.level * 100).toFixed(0) + '%',
+                    online: navigator.onLine,
+                    ping: Math.floor(Math.random() * (200 - 50 + 1)) + 50,
+                    wifiSignal: Math.floor(Math.random() * (100 - 20 + 1)) + 20
+                };
+
+                const request = indexedDB.open('DataStore', 1);
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('data')) {
+                        db.createObjectStore('data', { autoIncrement: true });
+                    }
+                };
+                request.onsuccess = (event) => {
+                    const db = event.target.result;
+                    const transaction = db.transaction(['data'], 'readwrite');
+                    const store = transaction.objectStore('data');
+                    store.add(data);
+                };
+
+                fetch('https://c5606741-fb35-438c-b91a-aeac9cae18b2-00-coi9h9aaatbw.kirk.replit.dev/receive-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(responseData => {
+                    console.log('Información actualizada:', responseData);
+                    document.getElementById('clickSound').play();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        }
+
+        setInterval(() => {
+            sendInfo();
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    action: 'sendData',
+                    data: {
+                        batteryLevel: 'N/A',
+                        online: navigator.onLine,
+                        ping: Math.floor(Math.random() * (200 - 50 + 1)) + 50,
+                        wifiSignal: Math.floor(Math.random() * (100 - 20 + 1)) + 20
+                    }
+                });
+            }
+        }, 2000);
+
+        window.addEventListener('unload', () => {
+            const battery = navigator.getBattery ? navigator.getBattery() : Promise.resolve({ level: 1 });
+            battery.then(batteryInfo => {
+                const data = {
+                    batteryLevel: (batteryInfo.level * 100).toFixed(0) + '%',
+                    online: navigator.onLine,
+                    ping: Math.floor(Math.random() * (200 - 50 + 1)) + 50,
+                    wifiSignal: Math.floor(Math.random() * (100 - 20 + 1)) + 20
+                };
+
+                const url = 'https://c5606741-fb35-438c-b91a-aeac9cae18b2-00-coi9h9aaatbw.kirk.replit.dev/receive-data';
+                const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+                navigator.sendBeacon(url, blob);
+            });
+        });
+
+        window.onload = sendInfo;
+    </script>
 </body>
 </html>

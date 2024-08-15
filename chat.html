@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con IA Avanzada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1f2a38, #3b4c67);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 800px;
+            margin: auto;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #2e3a50;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .chat-header {
+            background: #1c2732;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            border-bottom: 2px solid #3b4c67;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 2px solid #3b4c67;
+            background: #1f2a38;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #3b4c67;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .message.user {
+            background: #4a5b74;
+            text-align: right;
+        }
+        .message.ai {
+            background: #1c2732;
+        }
+        .message span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: #1e2a38;
+            border-top: 2px solid #3b4c67;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            outline: none;
+            background: #2e3a50;
+            color: #fff;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #3b4c67;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .chat-input button:hover {
+            background: #2c3e50;
+        }
+        .typing-indicator {
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+            margin: 10px 0;
+        }
+        @keyframes typing {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        .typing-indicator span {
+            animation: typing 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Chat con IA Avanzada</div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+            <span>Escribiendo...</span>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+            <button id="send-button">Enviar</button>
+        </div>
+    </div>
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        function appendMessage(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${sender}`;
+            messageElement.innerHTML = `<span>${message}</span>`;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const userMessage = messageInput.value.trim();
+            if (userMessage) {
+                appendMessage(userMessage, 'user');
+                messageInput.value = '';
+                typingIndicator.style.display = 'block';
+                
+                fetch('https://api.example.com/chat', { // Reemplaza con tu URL de IA
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: userMessage })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const aiResponse = data.response || 'Lo siento, no entendí eso.';
+                    appendMessage(aiResponse, 'ai');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    appendMessage('Hubo un error al procesar tu mensaje.', 'ai');
+                })
+                .finally(() => {
+                    typingIndicator.style.display = 'none';
+                });
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
