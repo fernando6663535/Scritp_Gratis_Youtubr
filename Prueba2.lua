@@ -1,5 +1,5 @@
 
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/fernando6663535/Scritp_Gratis_Youtubr/main/Prueba.lua"))()
+        
 local testers = {""}
 
 --[[getgenv().Stats = {-- Name, Rebcap, Statcap, Play Solo ONLY?
