@@ -136,7 +136,7 @@ local TeleportCheck = false
 local function executeScript()
     if not TeleportCheck then
         TeleportCheck = true
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/fernando6663535/Lua/main/Farm.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/fernando6663535/Scritp_Gratis_Youtubr/main/Prueba.lua"))()
         TeleportCheck = false
     end
 end
@@ -148,7 +148,7 @@ executeScript()
 if queueteleport then
     queueteleport([[
         task.wait(4.3)
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/fernando6663535/Lua/main/Farm.lua'))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/fernando6663535/Scritp_Gratis_Youtubr/main/Prueba.lua'))()
     ]])
 end
 
@@ -156,7 +156,7 @@ Players.LocalPlayer.OnTeleport:Connect(function(State)
     if not TeleportCheck and queueteleport then
         queueteleport([[
             task.wait(4.3)
-            loadstring(game:HttpGet('https://raw.githubusercontent.com/fernando6663535/Lua/main/Farm.lua'))()
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/fernando6663535/Scritp_Gratis_Youtubr/main/Prueba.lua'))()
         ]])
     end
 end)
